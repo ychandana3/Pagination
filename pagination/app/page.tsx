@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import Pagination from "../components/Pagination";
 import UserList from "../components/UserList";
 import Shimmer from "../components/Shimmer";
-
+import CardSlider from "@/components/Carousal";
 interface User {
   ID: string;
   JobTitle: string;
@@ -16,7 +16,7 @@ interface User {
 
 const Home: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const totalPages = 100;
   const [loading, setLoading] = useState(true);
 
@@ -26,7 +26,7 @@ const Home: React.FC = () => {
       setLoading(true);
       const response = await fetch(
         `https://give-me-users-forever.vercel.app/api/users/${
-          currentPage * 10
+          (currentPage - 1) * 10
         }/next`
       );
 

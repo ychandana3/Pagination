@@ -11,65 +11,89 @@ const Pagination: React.FC<PaginationProps> = ({
   totalPages,
   onPageChange,
 }) => {
-  const handlePrevPage = () => {
-    if (currentPage > 0) {
-      onPageChange(currentPage - 1);
+  const renderPageNumbers = () => {
+    const pageNumbers = [];
+    const maxPagesToShow = 7;
+    const halfRange = Math.floor(maxPagesToShow / 2);
+
+    let startPage = 1;
+    let endPage = startPage + maxPagesToShow - 1;
+
+    if (currentPage > maxPagesToShow) {
+      if (currentPage < totalPages - maxPagesToShow + 1) {
+        startPage = currentPage - halfRange;
+        endPage = currentPage + halfRange;
+      } else {
+        startPage = totalPages - maxPagesToShow + 1;
+        endPage = totalPages;
+      }
     }
-  };
 
-  const handleNextPage = () => {
-    if (currentPage < totalPages - 1) {
-      onPageChange(currentPage + 1);
+    if (startPage > 1) {
+      pageNumbers.push(
+        <button
+          key={1}
+          className="mx-1 px-2 py-1 border bg-white"
+          onClick={() => onPageChange(1)}
+        >
+          1
+        </button>,
+        <span key="start-ellipsis" className="px-2 py-1">
+          ...
+        </span>
+      );
     }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(
+        <button
+          key={i}
+          className={`mx-1 px-2 py-1 border ${
+            currentPage === i ? "bg-blue-500 text-white" : "bg-white"
+          }`}
+          onClick={() => onPageChange(i)}
+        >
+          {i}
+        </button>
+      );
+    }
+
+    if (endPage < totalPages) {
+      pageNumbers.push(
+        <span key="end-ellipsis" className="px-2 py-1">
+          ...
+        </span>,
+        <button
+          key={totalPages}
+          className="px-2 py-1 mx-1 border bg-white"
+          onClick={() => onPageChange(totalPages)}
+        >
+          {totalPages}
+        </button>
+      );
+    }
+
+    return pageNumbers;
   };
-
-  //To display only 5 buttons at a time
-  const maxPagesToShow = 5;
-  let startPage = Math.max(0, currentPage - Math.floor(maxPagesToShow / 2));
-  let endPage = startPage + maxPagesToShow;
-
-  if (endPage > totalPages) {
-    endPage = totalPages;
-    startPage = Math.max(0, endPage - maxPagesToShow);
-  }
-
-  const pages = Array.from(
-    { length: endPage - startPage },
-    (_, i) => startPage + i
-  );
 
   return (
-    <div className="flex justify-center mt-4 space-x-2">
+    <div className="flex justify-center mt-4">
       <button
-        className={`px-4 py-2 border rounded-l ${
-          currentPage === 0 ? "bg-gray-200 cursor-not-allowed" : "bg-white"
+        className={`px-2 py-1 mx-1 border ${
+          currentPage === 1 ? "cursor-not-allowed" : ""
         }`}
-        onClick={handlePrevPage}
-        disabled={currentPage === 0}
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage === 1}
       >
         Previous
       </button>
-      <div className="flex space-x-1">
-        {pages.map((page) => (
-          <button
-            key={page}
-            className={`px-4 py-2 border ${
-              currentPage === page ? "bg-blue-500 text-white" : "bg-white"
-            }`}
-            onClick={() => onPageChange(page)}
-          >
-            {page + 1}
-          </button>
-        ))}
-      </div>
+      <div className="flex">{renderPageNumbers()}</div>
       <button
-        className={`px-4 py-2 border rounded-r ${
-          currentPage === totalPages - 1
-            ? "bg-gray-200 cursor-not-allowed"
-            : "bg-white"
+        className={`px-2 py-1 mx-1 border ${
+          currentPage === totalPages ? "cursor-not-allowed" : ""
         }`}
-        onClick={handleNextPage}
-        disabled={currentPage === totalPages - 1}
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
       >
         Next
       </button>
